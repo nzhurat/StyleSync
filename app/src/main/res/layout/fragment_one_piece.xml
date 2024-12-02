@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".OnePieceFragment">
+
+    <FrameLayout
+        android:id="@+id/top_image_container"
+        android:layout_width="match_parent"
+        android:layout_height="384dp"
+        android:layout_gravity="center_horizontal|top"
+        android:layout_marginTop="10dp">
+
+        <ImageView
+            android:id="@+id/top_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitCenter"
+            android:contentDescription="Top Image" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/bottom_image_container"
+        android:layout_width="match_parent"
+        android:layout_height="135dp"
+        android:layout_gravity="center_horizontal|bottom"
+        android:layout_marginBottom="10dp">
+
+        <ImageView
+            android:id="@+id/bottom_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitCenter"
+            android:contentDescription="Bottom Image" />
+    </FrameLayout>
+
+    <ImageView
+        android:id="@+id/arrowright1"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_gravity="end|top"
+        android:layout_marginTop="150dp"
+        android:layout_marginEnd="10dp"
+        android:src="@drawable/arrowright" />
+
+    <ImageView
+        android:id="@+id/arrowleft1"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_gravity="start|top"
+        android:layout_marginTop="150dp"
+        android:layout_marginStart="10dp"
+        android:src="@drawable/arrowleft" />
+
+    <ImageView
+        android:id="@+id/arrowright2"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_gravity="end|bottom"
+        android:layout_marginBottom="50dp"
+        android:layout_marginEnd="10dp"
+        android:src="@drawable/arrowright" />
+
+    <ImageView
+        android:id="@+id/arrowleft2"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_gravity="start|bottom"
+        android:layout_marginBottom="50dp"
+        android:layout_marginStart="10dp"
+        android:src="@drawable/arrowleft" />
+
+</FrameLayout>
