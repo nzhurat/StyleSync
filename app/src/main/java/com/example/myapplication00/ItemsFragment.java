@@ -17,99 +17,63 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.ListResult;
 import com.google.firebase.storage.StorageReference;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ItemsFragment extends Fragment {
 
     private static final String TAG = "ItemsFragment";
     private GridLayout gridLayout;
+    private FirebaseUser currentUser;
+    private String category;
+    private final List<String> categories = Arrays.asList("Tops", "Bottoms", "Shoes", "Coats", "One-piece");
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_items, container, false);
-
         gridLayout = view.findViewById(R.id.gridLayout);
+        currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
+        // Retrieve the category passed from MainActivity
         if (getArguments() != null) {
-            String type = getArguments().getString("type", "all");
-            retrieveImages(type);
+            category = getArguments().getString("category", "all");
+        }
+
+        if (currentUser != null) {
+            retrieveImages();
         } else {
-            retrieveImages("all");
+            Toast.makeText(getContext(), "User not logged in", Toast.LENGTH_SHORT).show();
         }
 
         return view;
     }
 
-    private void retrieveImages(String type) {
+    private void retrieveImages() {
         FirebaseStorage storage = FirebaseStorage.getInstance();
-        StorageReference storageRef = storage.getReference();
+        String userId = currentUser.getUid();
 
-        List<StorageReference> allImages = new ArrayList<>();
+        // If category is "all", load images from all categories
+        List<String> categoriesToLoad = "all".equals(category) ? categories : Arrays.asList(category);
 
-        if ("all".equals(type)) {
-            allImages.add(storageRef.child("images/tops"));
-            allImages.add(storageRef.child("images/bottoms"));
-            allImages.add(storageRef.child("images/shoes"));
-            allImages.add(storageRef.child("images/onepiece"));
-            allImages.add(storageRef.child("images/outdoor"));
-        } else {
-            switch (type) {
-                case "tops":
-                    allImages.add(storageRef.child("images/tops"));
-                    allImages.add(storageRef.child("images/onepiece"));
-                    allImages.add(storageRef.child("images/outdoor"));
-                    break;
-                case "bottoms":
-                    allImages.add(storageRef.child("images/bottoms"));
-                    break;
-                case "shoes":
-                    allImages.add(storageRef.child("images/shoes"));
-                    break;
-                default:
-                    allImages.add(storageRef.child("images/" + type));
-                    break;
-            }
-        }
+        for (String cat : categoriesToLoad) {
+            StorageReference categoryRef = storage.getReference("users/" + userId + "/" + cat);
 
-        gridLayout.removeAllViews();
-
-        for (StorageReference folderRef : allImages) {
-            folderRef.listAll().addOnSuccessListener(new OnSuccessListener<ListResult>() {
-                @Override
-                public void onSuccess(ListResult listResult) {
-                    for (StorageReference itemRef : listResult.getItems()) {
-                        itemRef.getBytes(Long.MAX_VALUE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
-                            @Override
-                            public void onSuccess(byte[] bytes) {
-                                Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                                if (bitmap != null) {
-                                    addImageToGrid(bitmap);
-                                } else {
-                                    Log.e(TAG, "Failed to decode bitmap from bytes.");
-                                }
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.e(TAG, "Failed to load image bytes", e);
-                                Toast.makeText(getContext(), "Failed to load image", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
+            categoryRef.listAll().addOnSuccessListener(listResult -> {
+                for (StorageReference item : listResult.getItems()) {
+                    item.getBytes(Long.MAX_VALUE).addOnSuccessListener(bytes -> {
+                        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                        if (bitmap != null) {
+                            addImageToGrid(bitmap);
+                        }
+                    }).addOnFailureListener(e -> Log.e(TAG, "Failed to load image: " + item.getPath(), e));
                 }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Log.e(TAG, "Failed to list images", e);
-                    Toast.makeText(getContext(), "Failed to retrieve images", Toast.LENGTH_SHORT).show();
-                }
-            });
+            }).addOnFailureListener(e -> Log.e(TAG, "Failed to list files in " + cat, e));
         }
     }
 

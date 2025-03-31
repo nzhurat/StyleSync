@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.ListResult;
 import com.google.firebase.storage.StorageReference;
@@ -76,108 +77,86 @@ public class ThreePieceFragment extends Fragment {
     private void retrieveImages() {
         FirebaseStorage storage = FirebaseStorage.getInstance();
         StorageReference storageRef = storage.getReference();
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        StorageReference outdoorFolderRef = storageRef.child("images/outdoor");
-        StorageReference topsFolderRef = storageRef.child("images/tops");
-        StorageReference bottomsFolderRef = storageRef.child("images/bottoms");
-        StorageReference shoesFolderRef = storageRef.child("images/shoes");
+        StorageReference coatsFolderRef = storageRef.child("users/" + userId + "/Coats");
+        StorageReference topsFolderRef = storageRef.child("users/" + userId + "/Tops");
+        StorageReference bottomsFolderRef = storageRef.child("users/" + userId + "/Bottoms");
+        StorageReference shoesFolderRef = storageRef.child("users/" + userId + "/Shoes");
 
-        // Load outdoor images
-        outdoorFolderRef.listAll().addOnSuccessListener(new OnSuccessListener<ListResult>() {
-            @Override
-            public void onSuccess(ListResult listResult) {
-                outdoorImages.clear();
-                for (StorageReference itemRef : listResult.getItems()) {
-                    outdoorImages.add(itemRef);
-                }
-                if (!outdoorImages.isEmpty()) {
-                    loadImage(outdoorImages.get(currentOutdoorImageIndex), topImageView);
-                } else {
-                    Log.e(TAG, "No images found in the outdoor folder.");
-                }
-                updateArrowState();
+        // Load coats images
+        coatsFolderRef.listAll().addOnSuccessListener(listResult -> {
+            outdoorImages.clear();
+            for (StorageReference itemRef : listResult.getItems()) {
+                outdoorImages.add(itemRef);
             }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.e(TAG, "Failed to list outdoor images", e);
-                Toast.makeText(getContext(), "Failed to retrieve outdoor images", Toast.LENGTH_SHORT).show();
-                updateArrowState();
+            if (!outdoorImages.isEmpty()) {
+                loadImage(outdoorImages.get(currentOutdoorImageIndex), topImageView);
+            } else {
+                Log.e(TAG, "No images found in the Coats folder.");
             }
+            updateArrowState();
+        }).addOnFailureListener(e -> {
+            Log.e(TAG, "Failed to list coats images", e);
+            Toast.makeText(getContext(), "Failed to retrieve coats images", Toast.LENGTH_SHORT).show();
+            updateArrowState();
         });
 
         // Load tops images
-        topsFolderRef.listAll().addOnSuccessListener(new OnSuccessListener<ListResult>() {
-            @Override
-            public void onSuccess(ListResult listResult) {
-                topsImages.clear();
-                for (StorageReference itemRef : listResult.getItems()) {
-                    topsImages.add(itemRef);
-                }
-                if (!topsImages.isEmpty()) {
-                    loadImage(topsImages.get(currentTopsImageIndex), middleImageView1);
-                } else {
-                    Log.e(TAG, "No images found in the tops folder.");
-                }
-                updateArrowState();
+        topsFolderRef.listAll().addOnSuccessListener(listResult -> {
+            topsImages.clear();
+            for (StorageReference itemRef : listResult.getItems()) {
+                topsImages.add(itemRef);
             }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.e(TAG, "Failed to list tops images", e);
-                Toast.makeText(getContext(), "Failed to retrieve tops images", Toast.LENGTH_SHORT).show();
-                updateArrowState();
+            if (!topsImages.isEmpty()) {
+                loadImage(topsImages.get(currentTopsImageIndex), middleImageView1);
+            } else {
+                Log.e(TAG, "No images found in the Tops folder.");
             }
+            updateArrowState();
+        }).addOnFailureListener(e -> {
+            Log.e(TAG, "Failed to list tops images", e);
+            Toast.makeText(getContext(), "Failed to retrieve tops images", Toast.LENGTH_SHORT).show();
+            updateArrowState();
         });
 
         // Load bottoms images
-        bottomsFolderRef.listAll().addOnSuccessListener(new OnSuccessListener<ListResult>() {
-            @Override
-            public void onSuccess(ListResult listResult) {
-                bottomsImages.clear();
-                for (StorageReference itemRef : listResult.getItems()) {
-                    bottomsImages.add(itemRef);
-                }
-                if (!bottomsImages.isEmpty()) {
-                    loadImage(bottomsImages.get(currentBottomsImageIndex), middleImageView2);
-                } else {
-                    Log.e(TAG, "No images found in the bottoms folder.");
-                }
-                updateArrowState();
+        bottomsFolderRef.listAll().addOnSuccessListener(listResult -> {
+            bottomsImages.clear();
+            for (StorageReference itemRef : listResult.getItems()) {
+                bottomsImages.add(itemRef);
             }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.e(TAG, "Failed to list bottoms images", e);
-                Toast.makeText(getContext(), "Failed to retrieve bottoms images", Toast.LENGTH_SHORT).show();
-                updateArrowState();
+            if (!bottomsImages.isEmpty()) {
+                loadImage(bottomsImages.get(currentBottomsImageIndex), middleImageView2);
+            } else {
+                Log.e(TAG, "No images found in the Bottoms folder.");
             }
+            updateArrowState();
+        }).addOnFailureListener(e -> {
+            Log.e(TAG, "Failed to list bottoms images", e);
+            Toast.makeText(getContext(), "Failed to retrieve bottoms images", Toast.LENGTH_SHORT).show();
+            updateArrowState();
         });
 
         // Load shoes images
-        shoesFolderRef.listAll().addOnSuccessListener(new OnSuccessListener<ListResult>() {
-            @Override
-            public void onSuccess(ListResult listResult) {
-                shoesImages.clear();
-                for (StorageReference itemRef : listResult.getItems()) {
-                    shoesImages.add(itemRef);
-                }
-                if (!shoesImages.isEmpty()) {
-                    loadImage(shoesImages.get(currentShoesImageIndex), bottomImageView);
-                } else {
-                    Log.e(TAG, "No images found in the shoes folder.");
-                }
-                updateArrowState();
+        shoesFolderRef.listAll().addOnSuccessListener(listResult -> {
+            shoesImages.clear();
+            for (StorageReference itemRef : listResult.getItems()) {
+                shoesImages.add(itemRef);
             }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.e(TAG, "Failed to list shoes images", e);
-                Toast.makeText(getContext(), "Failed to retrieve shoes images", Toast.LENGTH_SHORT).show();
-                updateArrowState();
+            if (!shoesImages.isEmpty()) {
+                loadImage(shoesImages.get(currentShoesImageIndex), bottomImageView);
+            } else {
+                Log.e(TAG, "No images found in the Shoes folder.");
             }
+            updateArrowState();
+        }).addOnFailureListener(e -> {
+            Log.e(TAG, "Failed to list shoes images", e);
+            Toast.makeText(getContext(), "Failed to retrieve shoes images", Toast.LENGTH_SHORT).show();
+            updateArrowState();
         });
     }
+
 
     private void loadImage(StorageReference imageRef, ImageView imageView) {
         imageRef.getBytes(Long.MAX_VALUE).addOnSuccessListener(new OnSuccessListener<byte[]>() {

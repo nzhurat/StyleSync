@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.ListResult;
 import com.google.firebase.storage.StorageReference;
@@ -67,152 +68,67 @@ public class TwoPieceFragment extends Fragment {
 
     private void retrieveImages() {
         FirebaseStorage storage = FirebaseStorage.getInstance();
-        StorageReference storageRef = storage.getReference();
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        StorageReference storageRef = storage.getReference().child("users").child(userId);
 
-        StorageReference topsFolderRef = storageRef.child("images/tops");
-        StorageReference bottomsFolderRef = storageRef.child("images/bottoms");
-        StorageReference shoesFolderRef = storageRef.child("images/shoes");
+        StorageReference topsFolderRef = storageRef.child("Tops");
+        StorageReference bottomsFolderRef = storageRef.child("Bottoms");
+        StorageReference shoesFolderRef = storageRef.child("Shoes");
 
-        // Load top images
-        topsFolderRef.listAll().addOnSuccessListener(new OnSuccessListener<ListResult>() {
-            @Override
-            public void onSuccess(ListResult listResult) {
-                topImages.clear();
-                for (StorageReference itemRef : listResult.getItems()) {
-                    topImages.add(itemRef);
-                }
-                if (!topImages.isEmpty()) {
-                    loadImage(topImages.get(currentTopImageIndex), topImageView);
-                } else {
-                    Log.e(TAG, "No images found in the tops folder.");
-                }
-                updateArrowState();
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.e(TAG, "Failed to list tops images", e);
-                Toast.makeText(getContext(), "Failed to retrieve top images", Toast.LENGTH_SHORT).show();
-                updateArrowState();
-            }
-        });
+        loadImagesFromFolder(topsFolderRef, topImages, topImageView);
+        loadImagesFromFolder(bottomsFolderRef, middleImages, middleImageView);
+        loadImagesFromFolder(shoesFolderRef, bottomImages, bottomImageView);
+    }
 
-        // Load middle images
-        bottomsFolderRef.listAll().addOnSuccessListener(new OnSuccessListener<ListResult>() {
-            @Override
-            public void onSuccess(ListResult listResult) {
-                middleImages.clear();
-                for (StorageReference itemRef : listResult.getItems()) {
-                    middleImages.add(itemRef);
-                }
-                if (!middleImages.isEmpty()) {
-                    loadImage(middleImages.get(currentMiddleImageIndex), middleImageView);
-                } else {
-                    Log.e(TAG, "No images found in the bottoms folder.");
-                }
-                updateArrowState();
+    private void loadImagesFromFolder(StorageReference folderRef, List<StorageReference> imageList, ImageView imageView) {
+        folderRef.listAll().addOnSuccessListener(listResult -> {
+            imageList.clear();
+            imageList.addAll(listResult.getItems());
+            if (!imageList.isEmpty()) {
+                loadImage(imageList.get(0), imageView);
+            } else {
+                Log.e(TAG, "No images found in folder: " + folderRef.getPath());
             }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.e(TAG, "Failed to list bottoms images", e);
-                Toast.makeText(getContext(), "Failed to retrieve middle images", Toast.LENGTH_SHORT).show();
-                updateArrowState();
-            }
-        });
-
-        // Load bottom images
-        shoesFolderRef.listAll().addOnSuccessListener(new OnSuccessListener<ListResult>() {
-            @Override
-            public void onSuccess(ListResult listResult) {
-                bottomImages.clear();
-                for (StorageReference itemRef : listResult.getItems()) {
-                    bottomImages.add(itemRef);
-                }
-                if (!bottomImages.isEmpty()) {
-                    loadImage(bottomImages.get(currentBottomImageIndex), bottomImageView);
-                } else {
-                    Log.e(TAG, "No images found in the shoes folder.");
-                }
-                updateArrowState();
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.e(TAG, "Failed to list shoes images", e);
-                Toast.makeText(getContext(), "Failed to retrieve bottom images", Toast.LENGTH_SHORT).show();
-                updateArrowState();
-            }
+            updateArrowState();
+        }).addOnFailureListener(e -> {
+            Log.e(TAG, "Failed to list images from folder: " + folderRef.getPath(), e);
+            Toast.makeText(getContext(), "Failed to retrieve images", Toast.LENGTH_SHORT).show();
+            updateArrowState();
         });
     }
 
     private void loadImage(StorageReference imageRef, ImageView imageView) {
-        imageRef.getBytes(Long.MAX_VALUE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
-            @Override
-            public void onSuccess(byte[] bytes) {
-                Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                if (bitmap != null) {
-                    imageView.setImageBitmap(bitmap);
-                } else {
-                    Log.e(TAG, "Failed to decode bitmap from bytes.");
-                }
+        imageRef.getBytes(Long.MAX_VALUE).addOnSuccessListener(bytes -> {
+            Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+            if (bitmap != null) {
+                imageView.setImageBitmap(bitmap);
+            } else {
+                Log.e(TAG, "Failed to decode bitmap from bytes.");
             }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.e(TAG, "Failed to load image bytes", e);
-                Toast.makeText(getContext(), "Failed to load image", Toast.LENGTH_SHORT).show();
-            }
+        }).addOnFailureListener(e -> {
+            Log.e(TAG, "Failed to load image bytes", e);
+            Toast.makeText(getContext(), "Failed to load image", Toast.LENGTH_SHORT).show();
         });
     }
 
-    private void showNextTopImage() {
-        if (topImages.isEmpty() || currentTopImageIndex >= topImages.size() - 1) return;
-
-        currentTopImageIndex++;
-        loadImage(topImages.get(currentTopImageIndex), topImageView);
+    private void showNextImage(List<StorageReference> imageList, int currentIndex, ImageView imageView) {
+        if (imageList.isEmpty() || currentIndex >= imageList.size() - 1) return;
+        loadImage(imageList.get(++currentIndex), imageView);
         updateArrowState();
     }
 
-    private void showPreviousTopImage() {
-        if (topImages.isEmpty() || currentTopImageIndex <= 0) return;
-
-        currentTopImageIndex--;
-        loadImage(topImages.get(currentTopImageIndex), topImageView);
+    private void showPreviousImage(List<StorageReference> imageList, int currentIndex, ImageView imageView) {
+        if (imageList.isEmpty() || currentIndex <= 0) return;
+        loadImage(imageList.get(--currentIndex), imageView);
         updateArrowState();
     }
 
-    private void showNextMiddleImage() {
-        if (middleImages.isEmpty() || currentMiddleImageIndex >= middleImages.size() - 1) return;
-
-        currentMiddleImageIndex++;
-        loadImage(middleImages.get(currentMiddleImageIndex), middleImageView);
-        updateArrowState();
-    }
-
-    private void showPreviousMiddleImage() {
-        if (middleImages.isEmpty() || currentMiddleImageIndex <= 0) return;
-
-        currentMiddleImageIndex--;
-        loadImage(middleImages.get(currentMiddleImageIndex), middleImageView);
-        updateArrowState();
-    }
-
-    private void showNextBottomImage() {
-        if (bottomImages.isEmpty() || currentBottomImageIndex >= bottomImages.size() - 1) return;
-
-        currentBottomImageIndex++;
-        loadImage(bottomImages.get(currentBottomImageIndex), bottomImageView);
-        updateArrowState();
-    }
-
-    private void showPreviousBottomImage() {
-        if (bottomImages.isEmpty() || currentBottomImageIndex <= 0) return;
-
-        currentBottomImageIndex--;
-        loadImage(bottomImages.get(currentBottomImageIndex), bottomImageView);
-        updateArrowState();
-    }
+    private void showNextTopImage() { showNextImage(topImages, currentTopImageIndex, topImageView); }
+    private void showPreviousTopImage() { showPreviousImage(topImages, currentTopImageIndex, topImageView); }
+    private void showNextMiddleImage() { showNextImage(middleImages, currentMiddleImageIndex, middleImageView); }
+    private void showPreviousMiddleImage() { showPreviousImage(middleImages, currentMiddleImageIndex, middleImageView); }
+    private void showNextBottomImage() { showNextImage(bottomImages, currentBottomImageIndex, bottomImageView); }
+    private void showPreviousBottomImage() { showPreviousImage(bottomImages, currentBottomImageIndex, bottomImageView); }
 
     private void updateArrowState() {
         arrowRight1.setEnabled(currentTopImageIndex < topImages.size() - 1);

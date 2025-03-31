@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.ListResult;
 import com.google.firebase.storage.StorageReference;
@@ -63,9 +64,10 @@ public class OnePieceFragment extends Fragment {
     private void retrieveImages() {
         FirebaseStorage storage = FirebaseStorage.getInstance();
         StorageReference storageRef = storage.getReference();
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        StorageReference onePieceFolderRef = storageRef.child("images/onepiece");
-        StorageReference shoesFolderRef = storageRef.child("images/shoes");
+        StorageReference onePieceFolderRef = storageRef.child("users/" + userId + "/One-piece");
+        StorageReference shoesFolderRef = storageRef.child("users/" + userId + "/Shoes");
 
         // Load top images
         onePieceFolderRef.listAll().addOnSuccessListener(new OnSuccessListener<ListResult>() {
@@ -79,14 +81,14 @@ public class OnePieceFragment extends Fragment {
                     loadImage(onePieceImages.get(currentTopImageIndex), topImageView);
                     updateArrowVisibility();
                 } else {
-                    Log.e(TAG, "No images found in the onepiece folder.");
+                    Log.e(TAG, "No images found in the One-piece folder.");
                     updateArrowVisibility();
                 }
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Log.e(TAG, "Failed to list onepiece images", e);
+                Log.e(TAG, "Failed to list One-piece images", e);
                 Toast.makeText(getContext(), "Failed to retrieve top images", Toast.LENGTH_SHORT).show();
                 updateArrowVisibility();
             }
@@ -104,14 +106,14 @@ public class OnePieceFragment extends Fragment {
                     loadImage(shoesImages.get(currentBottomImageIndex), bottomImageView);
                     updateArrowVisibility();
                 } else {
-                    Log.e(TAG, "No images found in the shoes folder.");
+                    Log.e(TAG, "No images found in the Shoes folder.");
                     updateArrowVisibility();
                 }
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Log.e(TAG, "Failed to list shoes images", e);
+                Log.e(TAG, "Failed to list Shoes images", e);
                 Toast.makeText(getContext(), "Failed to retrieve bottom images", Toast.LENGTH_SHORT).show();
                 updateArrowVisibility();
             }
