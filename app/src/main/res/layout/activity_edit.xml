@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg"
+    tools:context=".CameraActivity">
+
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="279dp"
+        android:layout_height="274dp"
+        android:layout_centerInParent="true"
+        android:layout_marginStart="64dp"
+        android:layout_marginTop="64dp"
+        android:scaleType="centerCrop"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/CatText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="55dp"
+        android:layout_marginTop="100dp"
+        android:fontFamily="@font/roboto"
+        android:text="CATEGORY"
+        android:textColor="#081F5C"
+        android:textSize="20sp"
+        android:textStyle="normal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView" />
+
+    <TextView
+        android:id="@+id/ColText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="55dp"
+        android:layout_marginTop="25dp"
+        android:fontFamily="@font/roboto"
+        android:text="COLOUR"
+        android:textColor="#081F5C"
+        android:textSize="20sp"
+        android:textStyle="normal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/CatText" />
+
+    <TextView
+        android:id="@+id/SeasText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="55dp"
+        android:layout_marginTop="25dp"
+        android:fontFamily="@font/roboto"
+        android:text="SEASON"
+        android:textColor="#081F5C"
+        android:textSize="20sp"
+        android:textStyle="normal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ColText" />
+
+    <TextView
+        android:id="@+id/OccText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="55dp"
+        android:layout_marginTop="25dp"
+        android:fontFamily="@font/roboto"
+        android:text="OCCASION"
+        android:textColor="#081F5C"
+        android:textSize="20sp"
+        android:textStyle="normal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/SeasText" />
+
+    <Spinner
+        android:id="@+id/spinner1"
+        android:layout_width="168dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="43dp"
+        android:layout_marginTop="103dp"
+        android:background="@drawable/button_start_background"
+        android:entries="@array/menu_items"
+        android:popupBackground="@android:color/white"
+        android:spinnerMode="dropdown"
+        app:layout_constraintStart_toEndOf="@+id/CatText"
+        app:layout_constraintTop_toBottomOf="@+id/imageView" />
+
+    <Spinner
+        android:id="@+id/spinner2"
+        android:layout_width="168dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="65dp"
+        android:layout_marginTop="28dp"
+        android:background="@drawable/button_start_background"
+        android:entries="@array/colour_items"
+        android:popupBackground="@android:color/white"
+        android:spinnerMode="dropdown"
+        app:layout_constraintStart_toEndOf="@+id/ColText"
+        app:layout_constraintTop_toBottomOf="@+id/spinner1" />
+
+    <Spinner
+        android:id="@+id/spinner3"
+        android:layout_width="168dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="66dp"
+        android:layout_marginTop="28dp"
+        android:background="@drawable/button_start_background"
+        android:entries="@array/season_items"
+        android:popupBackground="@android:color/white"
+        android:spinnerMode="dropdown"
+        app:layout_constraintStart_toEndOf="@+id/SeasText"
+        app:layout_constraintTop_toBottomOf="@+id/spinner2" />
+
+    <Spinner
+        android:id="@+id/spinner4"
+        android:layout_width="168dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="45dp"
+        android:layout_marginTop="28dp"
+        android:background="@drawable/button_start_background"
+        android:entries="@array/occasion_items"
+        android:popupBackground="@android:color/white"
+        android:spinnerMode="dropdown"
+        app:layout_constraintStart_toEndOf="@+id/OccText"
+        app:layout_constraintTop_toBottomOf="@+id/spinner3" />
+
+    <Button
+        android:id="@+id/SaveButton"
+        android:layout_width="127dp"
+        android:layout_height="43dp"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="144dp"
+        android:background="@drawable/button_start_background"
+        android:fontFamily="@font/roboto"
+        android:fontWeight="450"
+        android:gravity="center_vertical"
+        android:paddingStart="34dp"
+        android:text="SAVE"
+        android:textColor="#081F5C"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/spinner4" />
+
+    <Button
+        android:id="@+id/DelButton"
+        android:layout_width="127dp"
+        android:layout_height="43dp"
+        android:layout_marginTop="765dp"
+        android:layout_marginEnd="50dp"
+        android:background="@drawable/button_start_background"
+        android:fontFamily="@font/roboto"
+        android:fontWeight="450"
+        android:gravity="center_vertical"
+        android:paddingStart="24dp"
+        android:text="DELETE"
+        android:textColor="#081F5C"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>
